@@ -5,7 +5,7 @@ import static speevy.cardGames.AmericanCardRank.*;
 import static speevy.cardGames.AmericanCardSuit.*;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -132,7 +132,7 @@ public class PileTest {
 		List<List<Card>> cards = Stream.of(ACE, TWO, THREE)
 				.map(rank -> new Card(HEARTS, rank))
 				.map(List::of)
-				.toList();
+				.collect(Collectors.toList());
 		
 		final Pile pile = new Pile();
 		for (var card : cards) {

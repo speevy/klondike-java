@@ -1,4 +1,10 @@
 package speevy.cardGames;
 
-public record Card (CardSuit suit, CardRank rank) {};
+import lombok.Data;
+
+@Data
+public class Card  {
+	private final CardSuit suit;
+	private final CardRank rank;
+}
 

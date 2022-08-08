@@ -2,6 +2,8 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import lombok.*;
 import speevy.cardGames.Card;
 import speevy.cardGames.cardContainers.CardOrigin;
@@ -77,9 +79,12 @@ public class Deck implements CardOrigin {
 	/**
 	 * External view of Deck's status
 	 */
-	public record DeckStatus (
-		int cardsOnWaste, int cardsOnStock, Optional<Card> topCardOnWaste	
-	) {}
+	@Data
+	public static class DeckStatus {
+		private final int cardsOnWaste;
+		private final int cardsOnStock;
+		private final Optional<Card> topCardOnWaste;	
+	};
 
 	public DeckStatus getStatus() {
 		final Optional<Card> top;

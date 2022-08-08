@@ -12,6 +12,7 @@ import java.util.function.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import lombok.*;
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.*;
 import speevy.cardGames.klondike.Klondike.*;
@@ -79,7 +80,13 @@ public class KlondikeTest {
 			klondike.moveCards(new CardHolder(PILE, 1), new CardHolder(FOUNDATION, -1), 1));
 	}
 	
-	private record KlondikeMockCardHolders (Deck deck, List<Pile> piles, List<Foundation> foundations) {
+	@Data
+	@AllArgsConstructor
+	private static class KlondikeMockCardHolders {
+		private final Deck deck;
+		private final List<Pile> piles;
+		private final List<Foundation> foundations;
+
 		KlondikeMockCardHolders() {
 			this(mock(Deck.class), new ArrayList<>(), new ArrayList<>());
 			
@@ -309,7 +316,7 @@ public class KlondikeTest {
 
 			final int number;
 			if (from < 7 && to < 7 ) { // <7 = Foundations
-				number = random.nextInt(1, 3);
+				number = random.nextInt(2) + 1;
 			} else {
 				number = 1;
 			}

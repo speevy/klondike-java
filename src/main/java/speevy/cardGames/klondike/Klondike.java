@@ -2,9 +2,11 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 import org.slf4j.*;
 
+import lombok.Data;
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.*;
 import speevy.cardGames.klondike.Deck.DeckStatus;
@@ -31,7 +33,14 @@ public class Klondike {
 		TAKE
 	}
 	
-	private record Action(ActionType type, CardOrigin origin, CardDestination destination, int cards) {
+	@Data
+	private static class Action{
+		
+		private final ActionType type;
+		private final CardOrigin origin;
+		private final CardDestination destination;
+		private final int cards;
+		
 		static Action take() { 
 			return new Action(ActionType.TAKE, null, null, 0); 
 		}
@@ -57,14 +66,16 @@ public class Klondike {
 	
 	public KlondikeStatus getStatus() {
 		return new KlondikeStatus(deck.getStatus(), 
-				piles.stream().map(Pile::getStatus).toList(),
-				foundations.stream().map(Foundation::getStatus).toList());
+				piles.stream().map(Pile::getStatus).collect(Collectors.toList()),
+				foundations.stream().map(Foundation::getStatus).collect(Collectors.toList()));
 	}
 	
-	public record KlondikeStatus (
-			DeckStatus deck, 
-			List<PileStatus> piles, 
-			List<FoundationStatus> foundations) {}
+	@Data
+	public static class KlondikeStatus {
+		private final DeckStatus deck;
+		private final List<PileStatus> piles;
+		private final List<FoundationStatus> foundations;
+	}
 	
 	public enum CardHolderType {
 		DECK,
@@ -72,15 +83,24 @@ public class Klondike {
 		FOUNDATION
 	}
 	
-	public record CardHolder(CardHolderType type, int index) {
-		public CardHolder {
-			if (type == null || index < 0 || index >= switch(type) {
-					case DECK -> 1;
-					case FOUNDATION -> 7;
-					case PILE -> 4;
-					}) {
+	@Data
+	public static class CardHolder {
+		private final CardHolderType type;
+		private final int index;
+	
+		public CardHolder(CardHolderType type, int index) {
+			final int maxIndex;
+			switch(type) {
+				case DECK: maxIndex = 1; break;
+				case FOUNDATION: maxIndex = 7; break;
+				case PILE: maxIndex = 4; break;
+				default: maxIndex = -1;
+			}
+			if (type == null || index < 0 || index >= maxIndex) {
 				throw new IllegalArgumentException();
 			}
+			this.type = type;
+			this.index = index;
 		}
 		
 		public CardHolder(CardHolderType type) { this(type, 0); }
@@ -107,19 +127,20 @@ public class Klondike {
 	}
 
 	private CardDestination getDestination(final CardHolder to) {
-		return switch(to.type()) {
-		case FOUNDATION -> foundations.get(to.index());
-		case PILE -> piles.get(to.index());
-		default -> throw new IllegalArgumentException("Can't move cards to deck");
-		};
+		switch(to.type()) {
+		case FOUNDATION: return foundations.get(to.index());
+		case PILE: return piles.get(to.index());
+		default: throw new IllegalArgumentException("Can't move cards to deck");
+		}
 	}
 
 	private CardOrigin getOrigin(final CardHolder from) {
-		return switch(from.type()) {
-		case DECK -> deck;
-		case FOUNDATION -> foundations.get(from.index());
-		case PILE -> piles.get(from.index());
-		};
+		switch(from.type()) {
+		case DECK: return deck;
+		case FOUNDATION: return foundations.get(from.index());
+		case PILE: return piles.get(from.index());
+		default: throw new IllegalArgumentException("Unkown origin " + from);
+		}
 	}
 
 	/**
@@ -183,12 +204,12 @@ public class Klondike {
 			return new CardHolder(CardHolderType.DECK);
 		}
 		
-		if (object instanceof Pile p) {
-			return new CardHolder(CardHolderType.PILE, piles.indexOf(p));
+		if (object instanceof Pile) {
+			return new CardHolder(CardHolderType.PILE, piles.indexOf((Pile) object));
 		}
 		
-		if (object instanceof Foundation f) {
-			return new CardHolder(CardHolderType.FOUNDATION, foundations.indexOf(f));
+		if (object instanceof Foundation) {
+			return new CardHolder(CardHolderType.FOUNDATION, foundations.indexOf((Foundation) object));
 		}
 
 		throw new IllegalArgumentException();

@@ -1,9 +1,11 @@
 package speevy.cardGames;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 @AllArgsConstructor
 @Getter
+@Accessors(fluent = false)
 public enum AmericanCardRank implements CardRank {
     ACE ("1", 1),
     TWO ("2", 2),
@@ -24,8 +26,9 @@ public enum AmericanCardRank implements CardRank {
 
     @Override
 	public boolean isImmediateNextOf(CardRank other) {
-		return (other instanceof AmericanCardRank otherAmerican) 
-				&& (otherAmerican.getIndex() + 1 == index);
+
+		return (other instanceof AmericanCardRank) 
+				&& (((AmericanCardRank)other).getIndex() + 1 == index);
 	}
 
     @Override

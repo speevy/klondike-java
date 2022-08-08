@@ -4,6 +4,7 @@ import static speevy.cardGames.AmericanCardRank.*;
 import static speevy.cardGames.AmericanCardSuit.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -125,7 +126,7 @@ public class FoundationTest {
 		List<Card> cards = new ArrayList<>(new AmericanCards().getAll());
 		Collections.shuffle(cards);
 		
-		return cards.stream().limit(hiddenNumber).toList();
+		return cards.stream().limit(hiddenNumber).collect(Collectors.toList());
 	}
 	
 	@Test

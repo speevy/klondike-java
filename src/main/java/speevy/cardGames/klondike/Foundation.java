@@ -2,6 +2,7 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
+import lombok.*;
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.*;
 
@@ -99,7 +100,12 @@ public class Foundation implements CardOrigin, CardDestination {
 	/**
 	 * External view of Foundation status
 	 */
-	public record FoundationStatus (int numHidden, Collection<Card> visible) {} 
+	@Data
+	@AllArgsConstructor
+	public static class FoundationStatus{
+		private final int numHidden;
+		Collection<Card> visible; 
+	}
 
 	/**
 	 * Constructor used to prepare test cases, do not use for other purposes.

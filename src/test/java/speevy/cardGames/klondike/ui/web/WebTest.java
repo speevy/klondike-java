@@ -14,8 +14,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +26,7 @@ import speevy.cardGames.klondike.storage.KlondikeRepository;
 
 @WebMvcTest(includeFilters = {@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = 
 	{KlondikeController.class, Cards.class, KlondikeService.class})})
+@Import(JacksonCustomSerializers.class)
 public class WebTest {
 	@Autowired 
 	private MockMvc mockMvc;

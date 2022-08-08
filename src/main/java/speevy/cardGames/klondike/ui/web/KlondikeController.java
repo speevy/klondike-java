@@ -8,8 +8,10 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import speevy.cardGames.klondike.Deck.DeckStatus;
 import speevy.cardGames.klondike.Klondike.*;
+import speevy.cardGames.*;
 import speevy.cardGames.klondike.KlondikeService;
 
 @RestController
@@ -22,8 +24,44 @@ public class KlondikeController {
 
 	private final KlondikeService service;
 	
-	private record Action(String action, String from, String to, Optional<Integer> number) {};
+	@Getter
+	@NoArgsConstructor
+	public static class Action {
+		public void setAction(String action) {
+			this.action = action;
+		}
+		public void setFrom(String from) {
+			this.from = from;
+		}
+		public void setTo(String to) {
+			this.to = to;
+		}
+		public void setNumber(Integer number) {
+			this.number = Optional.ofNullable(number);
+		}
+		private String action;
+		private String from;
+		private String to;
+		private Optional<Integer> number;	
+	}
 	
+	@GetMapping("/test")
+	DeckStatus test () {
+		return new DeckStatus (0, 1, 
+				Optional.of(new Card(AmericanCardSuit.CLUBS, AmericanCardRank.ACE)));
+	}
+
+	@GetMapping("/test2")
+	DeckStatus test2 () {
+		return new DeckStatus (0, 1, Optional.empty());
+	}
+
+	@GetMapping("/test3")
+	Optional<KlondikeStatus> test3 () {
+		String id = service.createGame();
+		return service.getStatus(id);
+	}
+
 	@PostMapping("/game")
 	public ResponseEntity<Void> createGame() throws URISyntaxException {
 		String id = service.createGame();
@@ -40,12 +78,14 @@ public class KlondikeController {
 	
 	@PutMapping(value="/game/{id}")
 	public ResponseEntity<KlondikeStatus> action (@PathVariable String id, @RequestBody Action action) {
-		return optionalToResponseEntity(switch(action.action()) {
-		case "take" -> service.take(id);
-		case "undo" -> service.undo(id);
-		case "move" -> service.move(id, parseCardHolder(action.from()), parseCardHolder(action.to()), action.number().orElse(1));
-		default -> throw new IllegalArgumentException("Unexpected value: " + action.action());
-		});
+		final Optional<KlondikeStatus> status;
+		switch(action.action()) {
+		case "take": status = service.take(id); break;
+		case "undo": status = service.undo(id); break;
+		case "move": status = service.move(id, parseCardHolder(action.from()), parseCardHolder(action.to()), action.number().orElse(1)); break;
+		default: throw new IllegalArgumentException("Unexpected value: " + action.action());
+		};
+		return optionalToResponseEntity(status);
 	}
 	
 	@DeleteMapping(value="/game/{id}") 
@@ -59,11 +99,15 @@ public class KlondikeController {
 			return new CardHolder(CardHolderType.DECK);
 		}
 		int index = Integer.parseInt(str.substring(1));
-		return new CardHolder(switch(str.charAt(0)) {
-		case 'p' -> CardHolderType.PILE;
-		case 'f' -> CardHolderType.FOUNDATION;
-		default -> throw new IllegalArgumentException("Unexpected value: " + str.charAt(0));
-		}, index - 1);
+		
+		CardHolderType type;
+		switch(str.charAt(0)) {
+		case 'p': type = CardHolderType.PILE; break;
+		case 'f': type = CardHolderType.FOUNDATION; break;
+		default: throw new IllegalArgumentException("Unexpected value: " + str.charAt(0));
+		}
+		
+		return new CardHolder(type, index - 1);
 	}
 	
 	@ExceptionHandler(IllegalArgumentException.class)

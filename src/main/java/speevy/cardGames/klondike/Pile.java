@@ -2,6 +2,7 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
+import lombok.Data;
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.*;
 
@@ -77,9 +78,11 @@ public class Pile implements CardOrigin, CardDestination {
 	/**
 	 * External view of Pile status
 	 */
-	public record PileStatus (
-		int numCards, Optional<Card> topCard	
-	) {}
+	@Data
+	public static class PileStatus {
+		private final int numCards;
+		private final Optional<Card> topCard;	
+	}
 
 	/**
 	 * Method used to prepare test cases, do not use for other purposes.
