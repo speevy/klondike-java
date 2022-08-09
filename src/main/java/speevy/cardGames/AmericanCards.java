@@ -2,9 +2,6 @@ package speevy.cardGames;
 
 import java.util.*;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class AmericanCards implements Cards {
 
 	@Override
