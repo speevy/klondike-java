@@ -2,8 +2,6 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import lombok.*;
 import speevy.cardGames.Card;
 import speevy.cardGames.cardContainers.CardOrigin;
