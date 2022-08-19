@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.*;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 import lombok.*;
 import speevy.cardGames.*;
@@ -15,12 +15,17 @@ import speevy.cardGames.klondike.Deck.DeckStatus;
 import speevy.cardGames.klondike.Foundation.FoundationStatus;
 import speevy.cardGames.klondike.Pile.PileStatus;
 
+@EqualsAndHashCode
 public class Klondike {
 
+	@JsonProperty("deck")
 	private final Deck deck;
+	@JsonProperty("piles")
 	private final List<Pile> piles;
+	@JsonProperty("foundations")
 	private final List<Foundation> foundations;
-	private final List<Action> actionLog = new ArrayList<>();
+	@JsonProperty("actionLog")
+	private final List<Action> actionLog;
 	
 	private static final Logger log = LoggerFactory.getLogger(Klondike.class);
 
@@ -30,21 +35,34 @@ public class Klondike {
 		}
 	}
 	
-	private enum ActionType {
+	protected enum ActionType {
 		MOVE_CARDS,
 		TAKE
 	}
 	
-	@Data
-	private static class Action{
+	@Value
+	@AllArgsConstructor
+	protected static class Action{
 		
+		@JsonProperty("type")
 		private final ActionType type;
-		private final CardOrigin origin;
-		private final CardDestination destination;
+		@JsonProperty("from")
+		private final CardHolder from;
+		@JsonProperty("to")
+		private final CardHolder to;
+		@JsonProperty("cards")
 		private final int cards;
 		
 		static Action take() { 
 			return new Action(ActionType.TAKE, null, null, 0); 
+		}
+		
+		@SuppressWarnings("unused") // Used by JSON deserialization
+		private Action() {
+			type = null;
+			from = null;
+			to = null;
+			cards = 0;
 		}
 	}
 	
@@ -64,8 +82,19 @@ public class Klondike {
 		}
 		
 		deck = new Deck(cards.subList(j, cards.size()));
+		
+		actionLog = new ArrayList<>();
 	}
 	
+	@SuppressWarnings("unused") // Used by JSON deserialization
+	private Klondike() {
+		piles = null;
+		foundations = null;
+		deck = null;
+		actionLog = null;
+	}
+	
+	@JsonIgnore
 	public KlondikeStatus getStatus() {
 		return new KlondikeStatus(deck.getStatus(), 
 				piles.stream().map(Pile::getStatus).collect(Collectors.toList()),
@@ -132,7 +161,7 @@ public class Klondike {
 			origin.undoPeek(cards);
 			throw e;
 		}
-		actionLog.add(new Action(ActionType.MOVE_CARDS, origin, destination, number));
+		actionLog.add(new Action(ActionType.MOVE_CARDS, from, to, number));
 		debug(() -> "Action: move from " + from + " to " + to + " cards " + cards);
 	}
 
@@ -162,6 +191,7 @@ public class Klondike {
 		this.deck = deck;
 		this.piles = piles;
 		this.foundations = foundations;
+		actionLog = new ArrayList<>();
 	}
 
 	public void toPile(final CardHolder from) {
@@ -173,7 +203,7 @@ public class Klondike {
 			try {
 				final Pile destination = piles.get(i);
 				destination.poke(cards);
-				actionLog.add(new Action(ActionType.MOVE_CARDS, origin, destination, 1));
+				actionLog.add(new Action(ActionType.MOVE_CARDS, from, new CardHolder(CardHolderType.PILE, i), 1));
 				return;
 			} catch (IllegalStateException e) {
 				// Do nothing
@@ -202,26 +232,14 @@ public class Klondike {
 			deck.undoTake();
 			log.debug("Undo take");
 		} else {
-			final Collection<Card> cards = action.destination().undoPoke(action.cards());
-			action.origin().undoPeek(cards);
-			debug(() -> "Undo move from " + getCardHolder(action.origin()) + 
-					" to " + getCardHolder(action.destination()) + " cards " + cards);
+			final CardOrigin origin = getOrigin(action.from());
+			final CardDestination destination = getDestination(action.to());
+			
+			final Collection<Card> cards = destination.undoPoke(action.cards());
+			
+			origin.undoPeek(cards);
+			debug(() -> "Undo move from " + action.from() + " to " + action.to() + " cards " + cards);
 		}
 	}
-	
-	private CardHolder getCardHolder(Object object) {
-		if (object instanceof Deck) {
-			return new CardHolder(CardHolderType.DECK);
-		}
-		
-		if (object instanceof Pile) {
-			return new CardHolder(CardHolderType.PILE, piles.indexOf((Pile) object));
-		}
-		
-		if (object instanceof Foundation) {
-			return new CardHolder(CardHolderType.FOUNDATION, foundations.indexOf((Foundation) object));
-		}
 
-		throw new IllegalArgumentException();
-	}
 }
