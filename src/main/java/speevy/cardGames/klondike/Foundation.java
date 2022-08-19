@@ -2,6 +2,8 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.*;
+
 import lombok.*;
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.*;
@@ -13,14 +15,24 @@ import speevy.cardGames.cardContainers.*;
  * the immediate previous value of the rank of the preceding card. If the
  * foundation is empty a KING of any suit is allowed.
  */
+@EqualsAndHashCode
 public class Foundation implements CardOrigin, CardDestination {
-	
-	private final ArrayList<Card> hidden = new ArrayList<>();
-	private final ArrayList<Card> visible = new ArrayList<>();
-	private final ArrayList<Boolean> peekCausedFlip = new ArrayList<>();
+	@JsonProperty("hidden")
+	private final List<Card> hidden;
+	@JsonProperty("visible")
+	private final ArrayList<Card> visible;
+	@JsonProperty("peekCausedFlip")
+	private final List<Boolean> peekCausedFlip;
+
+	public Foundation() {
+		super();
+		hidden = new ArrayList<>();
+		visible = new ArrayList<>();
+		peekCausedFlip = new ArrayList<>();
+	}
 	
 	public Foundation(List<Card> initialCards) {
-		super();
+		this();
 		hidden.addAll(initialCards.subList(0, initialCards.size() - 1));
 		visible.add(initialCards.get(initialCards.size() - 1));
 	}
@@ -92,6 +104,7 @@ public class Foundation implements CardOrigin, CardDestination {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@JsonIgnore
 	public FoundationStatus getStatus() {
 		return new FoundationStatus(hidden.size(), 
 				Collections.unmodifiableList((List<Card>) visible.clone()));
@@ -112,7 +125,7 @@ public class Foundation implements CardOrigin, CardDestination {
 	 */
 	@Deprecated
 	Foundation(Collection<Card> hidden, Collection<Card> visible) {
-		super();
+		this();
 		this.hidden.addAll(hidden);
 		this.visible.addAll(visible);
 	}

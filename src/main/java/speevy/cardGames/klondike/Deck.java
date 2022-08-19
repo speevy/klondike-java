@@ -2,6 +2,8 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.*;
+
 import lombok.*;
 import speevy.cardGames.Card;
 import speevy.cardGames.cardContainers.CardOrigin;
@@ -10,13 +12,24 @@ import speevy.cardGames.cardContainers.CardOrigin;
  * The deck of the game, consisting in two piles: the stock and the waste.
  * The waste also acts as a CardOrigin.
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@EqualsAndHashCode
 public class Deck implements CardOrigin {
-	final List<Card> stock = new ArrayList<>();
-	final List<Card> waste = new ArrayList<>();
-	final List<Boolean> takeCausedFlip = new ArrayList<>();
+	@JsonProperty("stock")
+	final List<Card> stock;
+	@JsonProperty("waste")
+	final List<Card> waste;
+	@JsonProperty("takeCausedFlip")
+	final List<Boolean> takeCausedFlip;
+	
+	Deck() {
+		super();
+		stock = new ArrayList<>();
+		waste = new ArrayList<>();
+		takeCausedFlip = new ArrayList<>();
+	}
 	
 	public Deck(Collection<Card> cards) {
+		this();
 		stock.addAll(cards);
 		take();
 	}
@@ -84,6 +97,7 @@ public class Deck implements CardOrigin {
 		private final Optional<Card> topCardOnWaste;	
 	};
 
+	@JsonIgnore
 	public DeckStatus getStatus() {
 		final Optional<Card> top;
 		

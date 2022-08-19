@@ -170,7 +170,7 @@ public class KlondikeTest {
 			final int numCards
 			) {
 		final KlondikeMockCardHolders mocks = new KlondikeMockCardHolders();
-		final Collection<Card> cards = new FoundationTest().generateDescendingAlColorStarting(0, 5);
+		final Collection<Card> cards = FoundationTest.generateDescendingAlColorStarting(0, 5);
 		when(origin.apply(mocks).peek(cards.size())).thenReturn(cards);
 		
 		Klondike klondike = new Klondike(mocks.deck(), mocks.piles(), mocks.foundations());
@@ -190,7 +190,7 @@ public class KlondikeTest {
 			Class<T> exception
 			) {
 		final KlondikeMockCardHolders mocks = new KlondikeMockCardHolders();
-		final Collection<Card> cards = new FoundationTest().generateDescendingAlColorStarting(0, 5);
+		final Collection<Card> cards = FoundationTest.generateDescendingAlColorStarting(0, 5);
 		when(origin.apply(mocks).peek(cards.size())).thenThrow(exception);
 		
 		Klondike klondike = new Klondike(mocks.deck(), mocks.piles(), mocks.foundations());
@@ -210,7 +210,7 @@ public class KlondikeTest {
 			Class<T> exception
 			) {
 		final KlondikeMockCardHolders mocks = new KlondikeMockCardHolders();
-		final Collection<Card> cards = new FoundationTest().generateDescendingAlColorStarting(0, 5);
+		final Collection<Card> cards = FoundationTest.generateDescendingAlColorStarting(0, 5);
 		when(origin.apply(mocks).peek(cards.size())).thenReturn(cards);
 		doThrow(exception).when(destination.apply(mocks)).poke(any());
 		

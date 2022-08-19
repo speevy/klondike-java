@@ -65,7 +65,7 @@ public class DeckTest {
 		assertEquals(new Card(suit, rank), deck.waste.get(wasteSize - 1));
 	}
 
-	private Deck createTestDeck() {
+	public static Deck createTestDeck() {
 		final Deck deck = new Deck();
 		
 		deck.stock.add(new Card(DIAMONDS, ACE));

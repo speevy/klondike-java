@@ -1,12 +1,14 @@
 package speevy.cardGames.klondike;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.*;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.*;
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.*;
 import speevy.cardGames.klondike.Deck.DeckStatus;
@@ -83,9 +85,11 @@ public class Klondike {
 		FOUNDATION
 	}
 	
-	@Data
+	@Value
 	public static class CardHolder {
+		@JsonProperty("type")
 		private final CardHolderType type;
+		@JsonProperty("index")
 		private final int index;
 	
 		public CardHolder(CardHolderType type, int index) {
@@ -104,8 +108,14 @@ public class Klondike {
 		}
 		
 		public CardHolder(CardHolderType type) { this(type, 0); }
+		
+		@SuppressWarnings("unused") // Used by JSON deserialization
+		private CardHolder() {
+			type = null;
+			index = 0;
+		}
 	}
-
+	
 	public void moveCards(final CardHolder from, final CardHolder to, final int number) {
 		if (from.equals(to)) {
 			throw new IllegalArgumentException("Can't move cards from and to the same cardHolder");

@@ -101,12 +101,12 @@ public class FoundationTest {
 	}
 	
 	@SuppressWarnings("deprecation")
-	private Foundation createTestFoundation(int hiddenNumber, int visibleStart, int visibleNumber) {
+	public static Foundation createTestFoundation(int hiddenNumber, int visibleStart, int visibleNumber) {
 		return new Foundation(createRandomCardSet(hiddenNumber),
 				generateDescendingAlColorStarting(visibleStart, visibleNumber));
 	}
 
-	private final List<Card> alternating = List.of(
+	private static final List<Card> alternating = List.of(
 			new Card(HEARTS, KING),
 			new Card(SPADES, QUEEN),
 			new Card(DIAMONDS, JACK),
@@ -118,11 +118,11 @@ public class FoundationTest {
 			new Card(HEARTS, FIVE)
 			);  
 
-	Collection<Card> generateDescendingAlColorStarting(int start, int number) {
+	static Collection<Card> generateDescendingAlColorStarting(int start, int number) {
 		return alternating.subList(start, start + number);
 	}
 
-	private Collection<Card> createRandomCardSet(int hiddenNumber) {
+	private static Collection<Card> createRandomCardSet(int hiddenNumber) {
 		List<Card> cards = new ArrayList<>(new AmericanCards().getAll());
 		Collections.shuffle(cards);
 		

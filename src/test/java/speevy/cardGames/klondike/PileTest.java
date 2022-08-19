@@ -31,7 +31,7 @@ public class PileTest {
 	}
 	
 	@SuppressWarnings("deprecation")
-	private Pile createTestPile() {
+	public static Pile createTestPile() {
 		final Pile pile = new Pile();
 		pile.addCards(List.of(
 				new Card (DIAMONDS, ACE),

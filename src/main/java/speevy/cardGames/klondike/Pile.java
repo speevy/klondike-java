@@ -2,8 +2,10 @@ package speevy.cardGames.klondike;
 
 import java.util.*;
 
-import lombok.Data;
-import speevy.cardGames.*;
+import com.fasterxml.jackson.annotation.*;
+
+import lombok.*;
+import speevy.cardGames.Card;
 import speevy.cardGames.cardContainers.*;
 
 /**
@@ -12,9 +14,15 @@ import speevy.cardGames.cardContainers.*;
  * When poking a card, it has to be the same suit and the next rank of the 
  * card at top of the pile. If the pile is empty an ACE of any suit is allowed.
  */
+@EqualsAndHashCode
 public class Pile implements CardOrigin, CardDestination {
 	
-	private final ArrayList<Card> cards = new ArrayList<>();
+	public Pile() {
+		cards = new ArrayList<>();
+	}
+	
+	@JsonProperty("cards")
+	private final List<Card> cards;
 
 	@Override
 	public void poke(Collection<Card> cardsToPoke) throws IllegalStateException {
@@ -68,6 +76,7 @@ public class Pile implements CardOrigin, CardDestination {
 		this.cards.addAll(cards);
 	}
 	
+	@JsonIgnore
 	public PileStatus getStatus() {
 		if (cards.isEmpty()) {
 			return new PileStatus(0, Optional.empty());
