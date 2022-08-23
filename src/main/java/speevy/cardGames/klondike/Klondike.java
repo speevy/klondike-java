@@ -165,6 +165,20 @@ public class Klondike {
 		debug(() -> "Action: move from " + from + " to " + to + " cards " + cards);
 	}
 
+	public boolean canMoveCards(final CardHolder from, final CardHolder to, final int number) {
+		if (from.equals(to)) {
+			return false;
+		}
+		
+		CardOrigin origin = getOrigin(from);
+		
+		CardDestination destination = getDestination(to); 
+		
+		Collection<Card> cards = origin.dryPeek(number);
+		
+		return !cards.isEmpty() && destination.dryPoke(cards);
+	}
+	
 	private CardDestination getDestination(final CardHolder to) {
 		switch(to.type()) {
 		case FOUNDATION: return foundations.get(to.index());

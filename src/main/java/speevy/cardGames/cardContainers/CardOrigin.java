@@ -21,5 +21,12 @@ public interface CardOrigin {
      */
     Collection<Card> peek(int number) throws IllegalStateException, IllegalArgumentException;
 
+    /** Peek an arbitrary number of cards. It should check the
+     *  business logic for allowing this peek of cards. If everything
+     *  is OK a vector containing the requested cards is returned, otherwise, an empty collection. 
+     *  The returned cards should NOT be removed from the Card Origin.
+     */
+    Collection<Card> dryPeek(int number);
+
     void undoPeek(Collection<Card> cards);
 }

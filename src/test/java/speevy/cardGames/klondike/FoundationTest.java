@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import speevy.cardGames.*;
+import speevy.cardGames.cardContainers.CardContainersTest;
 import speevy.cardGames.klondike.Foundation.FoundationStatus;
 
 public class FoundationTest {
@@ -22,20 +23,23 @@ public class FoundationTest {
 				new Card(DIAMONDS, THREE)
 				));
 		
-		assertEquals(new FoundationStatus(2, List.of(new Card(DIAMONDS, THREE))), 
-				foundation.getStatus());
+		assertEquals(new FoundationStatus(2, List.of(new Card(DIAMONDS, THREE))), foundation.getStatus());
+		
+		foundation.dryPeek(1);
+		assertEquals(new FoundationStatus(2, List.of(new Card(DIAMONDS, THREE))), foundation.getStatus());
+
+		foundation.dryPeek(2);
+		assertEquals(new FoundationStatus(2, List.of(new Card(DIAMONDS, THREE))), foundation.getStatus());
+
+		
+		foundation.peek(1);
+		assertEquals(new FoundationStatus(1, List.of(new Card(DIAMONDS, TWO))), foundation.getStatus());
 
 		foundation.peek(1);
-		assertEquals(new FoundationStatus(1, List.of(new Card(DIAMONDS, TWO))), 
-				foundation.getStatus());
+		assertEquals(new FoundationStatus(0, List.of(new Card(DIAMONDS, ACE))), foundation.getStatus());
 
 		foundation.peek(1);
-		assertEquals(new FoundationStatus(0, List.of(new Card(DIAMONDS, ACE))), 
-				foundation.getStatus());
-
-		foundation.peek(1);
-		assertEquals(new FoundationStatus(0, Collections.emptyList()), 
-				foundation.getStatus());
+		assertEquals(new FoundationStatus(0, Collections.emptyList()), foundation.getStatus());
 	}
 	
 	@Test
@@ -53,10 +57,10 @@ public class FoundationTest {
 	@Test
 	void foundationPeekOverflow() {
 		Foundation foundation = createTestFoundation(3, 0, 1);
-		assertThrows(IllegalStateException.class, () -> foundation.peek(2));
-
-		assertThrows(IllegalArgumentException.class, () -> foundation.peek(0));
-		assertThrows(IllegalArgumentException.class, () -> foundation.peek(-1));
+		
+		CardContainersTest.assertPeekFails(foundation, 2, IllegalStateException.class);
+		CardContainersTest.assertPeekFails(foundation, 0, IllegalArgumentException.class);
+		CardContainersTest.assertPeekFails(foundation, -1, IllegalArgumentException.class);
 	}
 	
 	@Test
@@ -71,6 +75,8 @@ public class FoundationTest {
 	private void foundationPokeCaseOk(int visibleStart, int visibleNumber, int toAdd) {
 		Foundation foundation = createTestFoundation(1, visibleStart, visibleNumber);
 		var cards = generateDescendingAlColorStarting(visibleStart + visibleNumber, toAdd);
+		
+		assertTrue(foundation.dryPoke(cards));
 		
 		foundation.poke(cards);
 		
@@ -88,6 +94,9 @@ public class FoundationTest {
 				final Foundation foundation = createTestFoundation(1, 0, 4); //last card is 10 CLUBS
 				final FoundationStatus status = foundation.getStatus();
 				
+				assertFalse(foundation.dryPoke(List.of(card)));
+				assertEquals (status, foundation.getStatus());
+
 				assertThrows(IllegalStateException.class, () -> foundation.poke(List.of(card)));
 				assertEquals (status, foundation.getStatus());
 			});

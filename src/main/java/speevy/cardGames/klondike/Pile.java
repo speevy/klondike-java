@@ -31,24 +31,28 @@ public class Pile implements CardOrigin, CardDestination {
 		}
 		final Card card = cardsToPoke.stream().findFirst().get();
 		
+		if (canPoke(card)) {
+			cards.add(card);
+		} else {
+			throw new WrongCardPileException();
+		}
+	}
+
+	private boolean canPoke(Card card) {
 		if (cards.isEmpty()) {
 			if (card.rank().isFirst()) {
-				cards.add(card);
-			} else {
-				throw new WrongCardPileException();
+				return true;
 			}
 		} else {
 			final Card topCard = cards.get(cards.size() - 1);
 			if (	card.suit().equals(topCard.suit())
 					&& card.rank().isImmediateNextOf(topCard.rank())) {
-				cards.add(card);
-			} else {
-				throw new WrongCardPileException();
+				return true;
 			}
-		}
-
+		}	
+		return false;
 	}
-
+	
 	@Override
 	public Collection<Card> undoPoke(int number) {
 		if (number != 1) {
@@ -128,5 +132,23 @@ public class Pile implements CardOrigin, CardDestination {
 					"Only one card at a time can be peek or poke from or to the Pile. Requested %d",
 					number));
 		}		
+	}
+
+	@Override
+	public boolean dryPoke(Collection<Card> cards) {
+		if (cards.size() != 1) {
+			return false;
+		}
+		
+		return canPoke(cards.stream().findFirst().get());
+	}
+
+	@Override
+	public Collection<Card> dryPeek(int number) {
+		if (number != 1 || cards.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		return List.of(cards.get(cards.size() - 1));
 	}
 }

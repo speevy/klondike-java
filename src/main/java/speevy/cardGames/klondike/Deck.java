@@ -124,4 +124,13 @@ public class Deck implements CardOrigin {
 			stock.clear();
 		}
 	}
+
+	@Override
+	public Collection<Card> dryPeek(int number) {
+		if (number != 1 || waste.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		return List.of(waste.get(waste.size() - 1));
+	}
 }

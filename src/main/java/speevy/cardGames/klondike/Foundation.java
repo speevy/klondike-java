@@ -42,15 +42,19 @@ public class Foundation implements CardOrigin, CardDestination {
 		if (cards.isEmpty()) {
 			throw new PokeEmptyException();
 		}
-		Card firstCard = cards.stream().findFirst().get();
 		
-		if ((visible.isEmpty() && !firstCard.rank().isLast())
-				|| (!visible.isEmpty() && !isDescendingAndAlternatingColors(
-						visible.get(visible.size() -1), firstCard))) {
+		if (cannotPoke(cards)) {
 				throw new NotAlternatingDescendingException();
 		}
 		
 		visible.addAll(cards);
+	}
+
+	private boolean cannotPoke(Collection<Card> cards) {
+		Card firstCard = cards.stream().findFirst().get();
+		return (visible.isEmpty() && !firstCard.rank().isLast())
+				|| (!visible.isEmpty() && !isDescendingAndAlternatingColors(
+						visible.get(visible.size() -1), firstCard));
 	}
 	
 	boolean isDescendingAndAlternatingColors(Card a, Card b) {
@@ -164,6 +168,21 @@ public class Foundation implements CardOrigin, CardDestination {
 		public NotEnoughCardsToPeekException(int size, int number) {
 			super(String.format("Invalid number of cards to peek: requested: %d, visible: %d", number, size));
 		}		
+	}
+
+	@Override
+	public boolean dryPoke(Collection<Card> cards) {
+		return !cannotPoke(cards);
+	}
+
+	@Override
+	public Collection<Card> dryPeek(int number) {
+		final int size = visible.size();
+		if (number <= 0 || size < number) {
+			return Collections.emptyList();
+		}
+		
+		return visible.subList(size - number, size);
 	}
 
 }

@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import speevy.cardGames.*;
 import speevy.cardGames.cardContainers.CardContainersTest;
-import speevy.cardGames.klondike.Deck.DeckStatus;
+import speevy.cardGames.klondike.Deck.*;
 
 
 public class DeckTest {
@@ -96,7 +96,7 @@ public class DeckTest {
 		CardContainersTest.assertPeekOneReturns(deck, new Card(CLUBS, TWO));
 		CardContainersTest.assertPeekOneReturns(deck, new Card(CLUBS, ACE));
 		
-		assertThrows(IllegalStateException.class, () -> deck.peek(1));
+		CardContainersTest.assertPeekFails(deck, 1, IllegalStateException.class);
 		
 	}
 	
@@ -105,7 +105,7 @@ public class DeckTest {
 	void deckPeekNotOne(int value) {
 		if (value != 1) {
 			final Deck deck = createTestDeck();
-			assertThrows(IllegalArgumentException.class, () -> deck.peek(value));
+			CardContainersTest.assertPeekFails(deck, value, TakeMoreThanOneFromWasteException.class);
 		}
 	}
 	
@@ -113,8 +113,14 @@ public class DeckTest {
 	void deckStatus() {
 		final Deck deck = createTestDeck();
 		checkStatus(deck.getStatus(), 3, 3, CLUBS, THREE);
+		
+		deck.dryPeek(1);
+		checkStatus(deck.getStatus(), 3, 3, CLUBS, THREE);
 
 		deck.peek(1);
+		checkStatus(deck.getStatus(), 3, 2, CLUBS, TWO);
+
+		deck.dryPeek(1);
 		checkStatus(deck.getStatus(), 3, 2, CLUBS, TWO);
 
 		deck.peek(1);

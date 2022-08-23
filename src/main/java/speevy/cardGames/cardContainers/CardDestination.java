@@ -18,6 +18,17 @@ public interface CardDestination {
      */
 	void poke(Collection<Card> cards) throws IllegalStateException;
 
+	/**
+	 *  Check the business logic for allowing this poke of cards. 
+     *  
+     *  The state of the CardDestination should not be altered.
+     *  
+     *  No exceptions should be thrown.
+     *  
+     *  @Returns true if the poke is valid, false if not.
+     */
+	boolean dryPoke(Collection<Card> cards);
+
 	Collection<Card> undoPoke(int number);
 
 }

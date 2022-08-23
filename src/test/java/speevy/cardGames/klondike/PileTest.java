@@ -26,7 +26,7 @@ public class PileTest {
 		CardContainersTest.assertPeekOneReturns(pile, new Card(DIAMONDS, TWO));
 		CardContainersTest.assertPeekOneReturns(pile, new Card(DIAMONDS, ACE));
 		
-		assertThrows(IllegalStateException.class, () -> pile.peek(1));
+		CardContainersTest.assertPeekFails(pile, 1, IllegalStateException.class);
 		
 	}
 	
@@ -47,7 +47,7 @@ public class PileTest {
 	void pilePeekNotOne(int value) {
 		if (value != 1) {
 			final Pile pile = createTestPile();
-			assertThrows(IllegalArgumentException.class, () -> pile.peek(value));
+			CardContainersTest.assertPeekFails(pile, value, IllegalArgumentException.class);
 		}
 	}
 	
@@ -67,6 +67,8 @@ public class PileTest {
 	void pilePokeCard(Pile pile, AmericanCardSuit suit, AmericanCardRank rank) {
 		final int beforeSize = pile.getStatus().numCards();
 		final Card card = new Card (suit, rank);
+		
+		assertTrue(pile.dryPoke(List.of(card)));
 		
 		pile.poke(List.of(card));
 		
@@ -100,6 +102,9 @@ public class PileTest {
 		
 		assertEquals(new PileStatus(3, Optional.of(new Card(DIAMONDS, THREE))), pile.getStatus());
 		
+		pile.dryPeek(1);
+		assertEquals(new PileStatus(3, Optional.of(new Card(DIAMONDS, THREE))), pile.getStatus());
+
 		pile.peek(1);
 		assertEquals(new PileStatus(2, Optional.of(new Card(DIAMONDS, TWO))), pile.getStatus());
 		
