@@ -39,6 +39,7 @@ public class CardGenerator {
 		final String suit = card.suit().getName().toLowerCase();
 		final String rank;
 		switch (card.rank().getName()) {
+		case "A": rank = "1"; break;
 		case "J": rank = "jack"; break;
 		case "Q": rank = "queen"; break;
 		case "K": rank = "king"; break;
