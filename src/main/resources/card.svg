@@ -8,7 +8,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
    <defs>
-	  <linearGradient xmlns="http://www.w3.org/2000/svg" x1="0" x2="1" y1="0" y2="1" id="Gradient1">
+	  <linearGradient xmlns="http://www.w3.org/2000/svg" x1="0" x2=".2" y1="0" y2="1" id="Gradient1">
         <stop offset="0%" stop-opacity="0"/>
         <stop stop-opacity="0" offset="30%"/>
         <stop offset="80%" stop-opacity="1"/>
@@ -18,8 +18,13 @@
    	 @import url('https://fonts.googleapis.com/css?family=Archivo+Narrow');
    	 text {font-family:'Archivo Narrow'}
       .top { font-size: 15pt; }
-      .main { font-size: 25pt; fill: white;}
+      .main { fill: white; text-anchor: middle; dominant-baseline: middle;}
       #border { fill: url(#Gradient1) }
+    g.icon {
+   		stroke:white;
+   		stroke-width:1;
+   		fill: white;
+   	}
    </style>
   <g id="card">
     <rect
@@ -47,6 +52,6 @@
        rx="5"
        ry="5" />
     <text id="topText" x="5" y="5" dominant-baseline="hanging" class="top cardColor"></text>
-    <text id="mainText" x="30" y="60" text-anchor="middle" dominant-baseline="middle" class="main"></text>
+    <text id="mainText" x="30" y="60" class="main"></text>
   </g>
 </svg>

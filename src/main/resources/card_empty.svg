@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+   width="60"
+   height="85"
+   version="1.1"
+   id="svg9"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g id="card">
+    <rect
+       id="border"
+       transform="translate(1, 1)"
+       fill="white"
+       stroke="#000000"
+       stroke-width="0.5"
+       stroke-linecap="round"
+       stroke-linejoin="bevel"
+       stroke-dasharray="4" 
+       width="58"
+       height="83"
+       rx="5"
+       ry="5" />
+   </g>
+</svg>

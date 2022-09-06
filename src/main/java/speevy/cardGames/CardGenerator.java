@@ -1,6 +1,7 @@
 package speevy.cardGames;
 
 import java.io.*;
+import java.util.*;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
@@ -10,6 +11,8 @@ import javax.xml.xpath.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+
+import lombok.Value;
 
 public class CardGenerator {
 
@@ -26,7 +29,7 @@ public class CardGenerator {
 
 	private void generateCard(final Card card) {
 		try {
-		Document baseCard = getBaseCard();
+		Document baseCard = getResourceAsDocument("card");
 		setCardValue(baseCard, card);
 		setCardColor(baseCard, card);
 		saveCard(baseCard, getFileName(card));
@@ -59,27 +62,54 @@ public class CardGenerator {
 		}
 	}
 
-	private void setCardValue(Document baseCard, Card card) throws XPathException {
+	private void setCardValue(Document doc, Card card) throws XPathException, ParserConfigurationException, SAXException, IOException {
+		String symbol = card.suit().getSymbol();
 		String cardValue = card.rank().getName() + card.suit().getSymbol();
-		Node topText = getNodeById(baseCard, "topText");
-		topText.appendChild(baseCard.createTextNode(cardValue));
+		Node topText = getNodeById(doc, "topText");
+		topText.appendChild(doc.createTextNode(cardValue));
 		
-		Node mainText = getNodeById(baseCard, "mainText");
-		mainText.appendChild(baseCard.createTextNode(card.suit().getSymbol()));
+		Element g = (Element) xPath.evaluate("/svg/g", doc, XPathConstants.NODE);
+		List<PositionAndSize> positions = positionMap.get(card.rank());
+		
+		if (positions == null) {
+			//J, Q, K
+			Document iconDocument = getResourceAsDocument(card.rank().getName());
+			
+			Element icon = (Element) xPath.evaluate("/svg/g", iconDocument, XPathConstants.NODE);
+			
+			icon.setAttribute("transform", "translate(0, 25) scale(2)");
+			icon.setAttribute("class", "icon");
+			
+			g.appendChild(doc.importNode(icon, true));
+			
+		} else {
+			positions.forEach(pos -> {
+				g.appendChild(drawMain(doc, pos, symbol));
+			});
+		}
 	}
 
+	private Element drawMain(Document doc, PositionAndSize pos, String content) {
+		Element text = doc.createElement("text");
+		text.setAttribute("x", Double.toString(pos.x));
+		text.setAttribute("y", Double.toString(pos.y));
+		text.setAttribute("font-size", Double.toString(pos.size) + "pt");
+		text.setAttribute("class", "main");
+		text.appendChild(doc.createTextNode(content));
+		return text;
+	}
+	
 	private Node getNodeById(Node doc, String id) throws XPathException {
 		
 		return (Node)xPath.evaluate("//*[@id=\""+id+"\"]", doc, XPathConstants.NODE);
 	}
 
-	private Document getBaseCard() throws ParserConfigurationException, SAXException, IOException {
+	private Document getResourceAsDocument(String name) throws ParserConfigurationException, SAXException, IOException {
 		
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        // root elements
-
-        return docBuilder.parse(CardGenerator.class.getResourceAsStream("/card.svg"));
+ 
+        return docBuilder.parse(CardGenerator.class.getResourceAsStream("/" + name + ".svg"));
 	}
 
 
@@ -93,4 +123,91 @@ public class CardGenerator {
         Transformer transformer = transformerFactory.newTransformer();
         transformer.transform(source, result);
     }
+    
+    @Value
+    private class PositionAndSize {
+    	private final double x;
+    	private final double y;
+    	private final double size;
+    }
+    
+    private final Map<CardRank, List<PositionAndSize>> positionMap = Map.of(
+    		AmericanCardRank.ACE, List.of(
+    				new PositionAndSize(30, 55, 25)
+    				),
+    		AmericanCardRank.TWO, List.of(
+    				new PositionAndSize(30, 30, 15),
+    				new PositionAndSize(30, 75, 15)
+    				),
+    		AmericanCardRank.THREE, List.of(
+    				new PositionAndSize(30, 35, 15),
+    				new PositionAndSize(30, 55, 15),
+    				new PositionAndSize(30, 75, 15)
+    				),
+    		AmericanCardRank.FOUR, List.of(
+    				new PositionAndSize(15, 35, 15),
+    				new PositionAndSize(15, 75, 15),
+    				new PositionAndSize(45, 35, 15),
+    				new PositionAndSize(45, 75, 15)
+    				),
+    		AmericanCardRank.FIVE, List.of(
+    				new PositionAndSize(15, 35, 15),
+    				new PositionAndSize(15, 75, 15),
+    				new PositionAndSize(45, 35, 15),
+    				new PositionAndSize(45, 75, 15),
+    				new PositionAndSize(30, 55, 15)
+   				),
+    		AmericanCardRank.SIX, List.of(
+    				new PositionAndSize(15, 35, 15),
+    				new PositionAndSize(15, 75, 15),
+    				new PositionAndSize(45, 35, 15),
+    				new PositionAndSize(45, 75, 15),
+    				new PositionAndSize(15, 55, 15),
+    				new PositionAndSize(45, 55, 15)
+    				),
+    		AmericanCardRank.SEVEN, List.of(
+    				new PositionAndSize(15, 35, 15),
+    				new PositionAndSize(15, 75, 15),
+    				new PositionAndSize(45, 35, 15),
+    				new PositionAndSize(45, 75, 15),
+    				new PositionAndSize(15, 55, 15),
+    				new PositionAndSize(45, 55, 15),
+    				new PositionAndSize(30, 45, 15)
+    				),
+    		AmericanCardRank.EIGHT, List.of(
+    				new PositionAndSize(15, 35, 15),
+    				new PositionAndSize(15, 75, 15),
+    				new PositionAndSize(45, 35, 15),
+    				new PositionAndSize(45, 75, 15),
+    				new PositionAndSize(15, 55, 15),
+    				new PositionAndSize(45, 55, 15),
+    				new PositionAndSize(30, 45, 15),
+    				new PositionAndSize(30, 65, 15)
+    				),
+    		AmericanCardRank.NINE, List.of(
+    				new PositionAndSize(15, 35, 10),
+    				new PositionAndSize(15, 48.33, 10),
+    				new PositionAndSize(15, 61.66, 10),
+    				new PositionAndSize(15, 75, 10),
+    				new PositionAndSize(45, 35, 10),
+    				new PositionAndSize(45, 48.33, 10),
+    				new PositionAndSize(45, 61.66, 10),
+    				new PositionAndSize(45, 75, 10),
+    				new PositionAndSize(30, 55, 10)
+    				),
+    		AmericanCardRank.TEN, List.of(
+    				new PositionAndSize(15, 35, 10),
+    				new PositionAndSize(15, 48.33, 10),
+    				new PositionAndSize(15, 61.66, 10),
+    				new PositionAndSize(15, 75, 10),
+    				new PositionAndSize(45, 35, 10),
+    				new PositionAndSize(45, 48.33, 10),
+    				new PositionAndSize(45, 61.66, 10),
+    				new PositionAndSize(45, 75, 10),
+    				new PositionAndSize(30, 41.66, 10),
+    				new PositionAndSize(30, 68.33, 10)
+    				)
+    		);
+    
+    
 }

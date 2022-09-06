@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+   width="60"
+   height="85"
+   version="1.1"
+   id="svg9"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+   <defs>
+<pattern id="transformedPattern"
+         x="5" y="5" width="10" height="10"
+         patternUnits="userSpaceOnUse"
+         patternTransform="rotate(45)"
+        >
+
+    <circle cx="5" cy="5" r="5" style="stroke: none; fill: #2020A0" />
+
+  </pattern>
+     </defs>
+  <g id="card">
+    <rect
+       id="back"
+       transform="translate(1, 1)"
+       fill="white"
+       stroke="#000000"
+       stroke-width="0.5"
+       stroke-linecap="round"
+       stroke-linejoin="bevel"
+       width="58"
+       height="83"
+       rx="5"
+       ry="5" />
+    <rect
+       id="border"
+       transform="translate(3, 3)"
+       stroke="#000000"
+       stroke-width="0.2"
+       fill="url(#transformedPattern)"
+       width="54"
+       height="79"
+       />
+  </g>
+</svg>
